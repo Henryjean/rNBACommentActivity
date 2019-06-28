@@ -1,5 +1,7 @@
+#set WD
 setwd("~/GitHub/rNBACommentActivity")
 
+#load necessary packages
 library(tidyverse)
 library(jsonlite)
 library(data.table)
@@ -8,6 +10,7 @@ library(magick)
 library(scales)
 library(lubridate)
 
+#create custom theme for plot
 theme_owen <- function () { 
   theme_minimal(base_size=9, base_family="Gill Sans MT") %+replace% 
     theme(
@@ -17,7 +20,7 @@ theme_owen <- function () {
 }
 
 
-# Get r/nba Daily Comment Activity From Pushshift.io
+#Get r/nba Daily Comment Activity From Pushshift API
 url <- "http://api.pushshift.io/reddit/comment/search/?subreddit=nba&aggs=created_utc&frequency=day&after=365&size=0"
 json_data <- fromJSON(paste(readLines(url), collapse=""))
 df <- as.data.frame(json_data[["aggs"]][["created_utc"]])
@@ -28,12 +31,12 @@ df$created_utc <- as.numeric(as.character(df$key))
 df$date <- format(as.POSIXct(df$created_utc, origin = "1970-01-01", tz = 'America/New_York', usetz=TRUE))
 df$date <- ymd(as.Date(df$date))
 
-#Create a vecotor of important dates that we'll highlight later
+#Create a vecotor of important dates that we'll highlight later in the graph
 important.dates <- c(as.Date("2019-02-06"), as.Date("2019-06-13"), as.Date("2019-06-10"), as.Date("2018-07-01"), 
            as.Date("2018-07-02"), as.Date("2018-07-17"), as.Date("2018-10-16"), as.Date("2019-06-20"), 
            as.Date("2019-04-27"), as.Date("2019-01-03"))
 
-#If date is equal to important date, then highlight 
+#If date is equal to important date, then say so. Otherwise leave blank
 df$fill <- ifelse(df$date %in% important.dates, "Important Date", " ")
 
 #Chart daily comment activity from July 1, 2018 to June 30, 2019
@@ -63,16 +66,17 @@ df %>% filter(date >= "2018-07-01") %>%
         plot.subtitle = element_text(hjust = .5), 
         legend.position = 'none') 
 
-
+#Save graf
 ggsave("CommentData.png", width = 8, height = 4)
 
-
-
+#Load footer
 footy <- image_read("footer.png")
 
+#Recall saved graf
 graf <- image_read("CommentData.png")
+
+#Combine graf with footer 
 img <- c(graf, footy)
-
-
 image_composite(graf, footy, offset = "+0+1145") %>% image_write("CommentData.png")
+
 
