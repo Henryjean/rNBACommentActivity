@@ -1,4 +1,3 @@
-# r/nba comment acitivty
 ![](CommentData.png)
 
 R Code how to scrape and visualize r/nba comment aciticty.
