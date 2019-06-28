@@ -1,3 +1,5 @@
+setwd("~/GitHub/rNBACommentActivity")
+
 library(tidyverse)
 library(jsonlite)
 library(data.table)
@@ -15,43 +17,31 @@ theme_owen <- function () {
 }
 
 
-# find the words most distinctive to each document
+# Get r/nba Daily Comment Activity From Pushshift.io
 url <- "http://api.pushshift.io/reddit/comment/search/?subreddit=nba&aggs=created_utc&frequency=day&after=365&size=0"
-
-url <- "http://api.pushshift.io/reddit/submission/search/?subreddit=nba&aggs=created_utc&frequency=day&after=365d&size=0"
-
 json_data <- fromJSON(paste(readLines(url), collapse=""))
-
 df <- as.data.frame(json_data[["aggs"]][["created_utc"]])
 
 
+#Reformat date
 df$created_utc <- as.numeric(as.character(df$key))
-df$time <- format(as.POSIXct(df$created_utc, origin = "1970-01-01", tz = 'America/New_York', usetz=TRUE))
-df$time <- ymd_hms(df$time)
+df$date <- format(as.POSIXct(df$created_utc, origin = "1970-01-01", tz = 'America/New_York', usetz=TRUE))
+df$date <- ymd(as.Date(df$date))
 
-
-
-df %>% filter(time >= "2018-07-01") %>% View()
-
-submissions <- df
-comments <- df
-
-
-
-comments$date <- ymd(as.Date(comments$time))
-
-dates <- c(as.Date("2019-02-06"), as.Date("2019-06-13"), as.Date("2019-06-10"), as.Date("2018-07-01"), 
+#Create a vecotor of important dates that we'll highlight later
+important.dates <- c(as.Date("2019-02-06"), as.Date("2019-06-13"), as.Date("2019-06-10"), as.Date("2018-07-01"), 
            as.Date("2018-07-02"), as.Date("2018-07-17"), as.Date("2018-10-16"), as.Date("2019-06-20"), 
            as.Date("2019-04-27"), as.Date("2019-01-03"))
 
+#If date is equal to important date, then highlight 
+df$fill <- ifelse(df$date %in% important.dates, "Important Date", " ")
 
-comments$fill <- ifelse(comments$date %in% dates, "A", "B")
-
-comments %>% filter(time >= "2018-07-01") %>% 
-  ggplot(aes(x = as.Date(time), y = doc_count, fill = fill)) +
+#Chart daily comment activity from July 1, 2018 to June 30, 2019
+df %>% filter(date >= "2018-07-01") %>% 
+  ggplot(aes(x = date, y = doc_count, fill = fill)) +
   geom_bar(stat = 'identity') + 
+  scale_fill_manual(values = c("#969696", "#de2d26")) +
   theme_owen() +
-  theme(legend.position = 'none') + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b %Y") +
   scale_y_continuous(labels = comma, limits = c(0, 200000), breaks = seq(0, 200000, 50000)) +
   annotate(geom = 'text', x = as.Date("2019-02-07"), y = 125000, label = "Trade Deadline", family = "Gill Sans MT", size = 2.5) + 
@@ -70,8 +60,8 @@ comments %>% filter(time >= "2018-07-01") %>%
        y = "Total Comments", 
        caption = "") + 
   theme(plot.title = element_text(face = 'bold', hjust = .5), 
-        plot.subtitle = element_text(hjust = .5)) +
-  scale_fill_manual(values = c("#de2d26", "#969696"))
+        plot.subtitle = element_text(hjust = .5), 
+        legend.position = 'none') 
 
 
 ggsave("CommentData.png", width = 8, height = 4)
