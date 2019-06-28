@@ -8,4 +8,4 @@ Owen Phillips ([@llewellyn_jean](https://instagram.com/llewellyn_jean/))
 
 ## Special Credits
 
-[Pushshit.io](http://pushshift.io), for his API, which is awesome. 
+Jason Baumgartner and his awesome API [Pushshit.io](http://pushshift.io). 
