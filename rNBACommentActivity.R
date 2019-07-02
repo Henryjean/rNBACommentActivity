@@ -43,7 +43,7 @@ important.dates <- c(as.Date("2018-07-01"), as.Date("2018-07-02"), as.Date("2018
 df$fill <- ifelse(df$date %in% important.dates, "Important Date", " ")
 
 #Chart daily comment activity from July 1, 2018 to June 30, 2019
-df %>% filter(date >= "2018-07-01" & date < "2019-07-01") %>% 
+df %>% filter(date >= "2018-07-01" & date < "2019-07-01") %>%
   ggplot(aes(x = date, y = doc_count, fill = fill)) +
   geom_bar(stat = 'identity') + 
   scale_fill_manual(values = c("#969696", "#de2d26")) +
