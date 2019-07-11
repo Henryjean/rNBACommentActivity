@@ -1,6 +1,6 @@
 ![](CommentData.png)
 
-R Code how to scrape and visualize r/nba comment aciticty.
+R code how to scrape and visualize r/nba comment activity.
 
 ## Author
 Owen Phillips ([@llewellyn_jean](https://instagram.com/llewellyn_jean/))
