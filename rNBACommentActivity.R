@@ -9,6 +9,7 @@ library(extrafont)
 library(magick)
 library(scales)
 library(lubridate)
+library(zoo)
 
 #create custom theme for plot
 theme_owen <- function () { 
@@ -30,6 +31,7 @@ df <- as.data.frame(json_data[["aggs"]][["created_utc"]])
 df$created_utc <- as.numeric(as.character(df$key))
 df$date <- format(as.POSIXct(df$created_utc, origin = "1970-01-01", tz = "America/New_York", usetz=TRUE))
 df$date <- ymd(as.Date(df$date))
+
 
 View(df)
 
@@ -91,3 +93,47 @@ img <- c(graf, footy)
 image_composite(graf, footy, offset = "+0+1145") %>% image_write("CommentData.png")
 
 
+## Most active days on the Sub 
+
+df$RollingAverage <- rollmean(as.numeric(df$doc_count), k = 365, na.pad = TRUE, align = 'center')
+df$Per <- as.numeric(df$doc_count) / df$RollingAverage
+
+df %>% filter(date >= "2012-01-01") %>% View()
+df %>% filter(date >= "2012-01-01") %>% 
+  top_n(10, Per) %>% 
+  ggplot(aes(x = reorder(as.factor(date), Per), y = Per)) + 
+  geom_bar(stat = 'identity', fill ='floralwhite', color = 'black') + 
+  theme_owen() + 
+  coord_flip() + 
+  scale_y_continuous(breaks = seq(0, 5, 1), labels = c("0", "1x", "2x", "3x", "4x", "5x")) +
+  labs(x = "", 
+       y = "Daily comment total relative to yearly rolling average", 
+       title = "Top 10 Most Active Days On r/nba Since 2012\n(adjusted for subscriber inflation)") + 
+  theme(plot.title = element_text(face = 'bold', hjust = .5, size = 16, lineheight = .85), 
+        plot.subtitle = element_text(hjust = .5, size = 13), 
+        legend.position = 'none') + 
+  annotate(geom = 'text', x = 10, y = .05, label = "July 11, 2014: LeBron Announces His Return to Cleveland", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 9, y = .05, label = "June 19, 2016: NBA Finals (CLE/GSW) Game 7", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 8, y = .05, label = "May 31, 2018: NBA Finals (CLE/GSW) Game 1", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 7, y = .05, label = "July 4, 2016: KD Signs with the Warriors", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 6, y = .05, label = "July 1, 2018: Free Agency Starts", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 5, y = .05, label = "July 2, 2018: LeBron Signs with the Lakers", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 4, y = .05, label = "June 17, 2013: NBA Finals (MIA/SAS) Game 6", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 3, y = .05, label = "June 20, 2012: NBA Finals (MIA/OKC) Game 5", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 2, y = .05, label = "June 19, 2013: NBA Finals (MIA/SAS) Game 7", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 1, y = .05, label = "June 6, 2018: NBA Finals (CLE/GSW) Game 3", fontface = 'bold', hjust = 0) +
+  theme(axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())  + 
+  theme(plot.margin = unit(c(1, 1, 1, 1), "lines"))
+
+ggsave("test.png", width = 6, height = 6)
+
+footy <- image_read("ShortFooter.png")
+
+#Recall saved graf
+graf <- image_read("test.png")
+
+#Combine graf with footer 
+img <- c(graf, footy)
+image_composite(graf, footy, offset = "+0+1740") %>% image_write("test.png")
