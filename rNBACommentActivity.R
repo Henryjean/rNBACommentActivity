@@ -98,7 +98,6 @@ image_composite(graf, footy, offset = "+0+1145") %>% image_write("CommentData.pn
 df$RollingAverage <- rollmean(as.numeric(df$doc_count), k = 365, na.pad = TRUE, align = 'center')
 df$Per <- as.numeric(df$doc_count) / df$RollingAverage
 
-df %>% filter(date >= "2012-01-01") %>% View()
 df %>% filter(date >= "2012-01-01") %>% 
   top_n(10, Per) %>% 
   ggplot(aes(x = reorder(as.factor(date), Per), y = Per)) + 
@@ -114,26 +113,26 @@ df %>% filter(date >= "2012-01-01") %>%
         legend.position = 'none') + 
   annotate(geom = 'text', x = 10, y = .05, label = "July 11, 2014: LeBron Announces His Return to Cleveland", fontface = 'bold', hjust = 0) +
   annotate(geom = 'text', x = 9, y = .05, label = "June 19, 2016: NBA Finals (CLE/GSW) Game 7", fontface = 'bold', hjust = 0) +
-  annotate(geom = 'text', x = 8, y = .05, label = "May 31, 2018: NBA Finals (CLE/GSW) Game 1", fontface = 'bold', hjust = 0) +
-  annotate(geom = 'text', x = 7, y = .05, label = "July 4, 2016: KD Signs with the Warriors", fontface = 'bold', hjust = 0) +
-  annotate(geom = 'text', x = 6, y = .05, label = "July 1, 2018: Free Agency Starts", fontface = 'bold', hjust = 0) +
-  annotate(geom = 'text', x = 5, y = .05, label = "July 2, 2018: LeBron Signs with the Lakers", fontface = 'bold', hjust = 0) +
-  annotate(geom = 'text', x = 4, y = .05, label = "June 17, 2013: NBA Finals (MIA/SAS) Game 6", fontface = 'bold', hjust = 0) +
-  annotate(geom = 'text', x = 3, y = .05, label = "June 20, 2012: NBA Finals (MIA/OKC) Game 5", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 8, y = .05, label = "July 4, 2016: KD Signs with the Warriors", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 7, y = .05, label = "June 12, 2017: NBA Finals (CLE/GSW) Game 5", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 6, y = .05, label = "June 17, 2013: NBA Finals (MIA/SAS) Game 6", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 5, y = .05, label = "May 31, 2018: NBA Finals (CLE/GSW) Game 1", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 4, y = .05, label = "June 20, 2012: NBA Finals (MIA/OKC) Game 5", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 3, y = .05, label = "July 1, 2018: LeBron Signs with the Lakers", fontface = 'bold', hjust = 0) +
   annotate(geom = 'text', x = 2, y = .05, label = "June 19, 2013: NBA Finals (MIA/SAS) Game 7", fontface = 'bold', hjust = 0) +
-  annotate(geom = 'text', x = 1, y = .05, label = "June 6, 2018: NBA Finals (CLE/GSW) Game 3", fontface = 'bold', hjust = 0) +
+  annotate(geom = 'text', x = 1, y = .05, label = "June 16, 2016: NBA Finals (CLE/GSW) Game 6", fontface = 'bold', hjust = 0) +
   theme(axis.title.y=element_blank(),
         axis.text.y=element_blank(),
         axis.ticks.y=element_blank())  + 
   theme(plot.margin = unit(c(1, 1, 1, 1), "lines"))
 
-ggsave("test.png", width = 6, height = 6)
+ggsave("MostActive.png", width = 6, height = 6)
 
 footy <- image_read("ShortFooter.png")
 
 #Recall saved graf
-graf <- image_read("test.png")
+graf <- image_read("MostActive.png")
 
 #Combine graf with footer 
 img <- c(graf, footy)
-image_composite(graf, footy, offset = "+0+1740") %>% image_write("test.png")
+image_composite(graf, footy, offset = "+0+1740") %>% image_write("MostActive.png")
